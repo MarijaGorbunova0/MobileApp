@@ -75,6 +75,9 @@
 	  <Compile Update="slider.xaml.cs">
 	    <DependentUpon>slider.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Blank.xaml.cs">
+	    <DependentUpon>Blank.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -94,6 +97,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Timer_Page.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Blank.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ValgusfoorPage.xaml">
