@@ -1,22 +1,24 @@
 using Microsoft.Maui.Controls;
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TARpv23_Mobiile_App
 {
     public partial class Blank : ContentPage
     {
-        private bool isCrossTurn = true; 
-        private Image[,] cellImages = new Image[3, 3]; 
+        private bool isCrossTurn = true;
+        private Image[,] cellImages = new Image[3, 3];
         private Grid grid;
-        private Button StartBTN; 
+        private Button StartBTN;
         private bool AgainstBot = false;
-        private Random random = new Random(); 
+        private Random random = new Random();
         private string selectedTheme = "Light";
+        private string botDifficulty = "Medium"; // По умолчанию средний уровень сложности
 
         public Blank()
         {
-
             StartBTN = new Button
             {
                 Text = "Mängima",
@@ -28,7 +30,6 @@ namespace TARpv23_Mobiile_App
                 Padding = new Thickness(20, 10)
             };
             StartBTN.Clicked += SelectMode;
-
 
             grid = new Grid
             {
@@ -44,10 +45,9 @@ namespace TARpv23_Mobiile_App
                     new ColumnDefinition { Width = 150 },
                     new ColumnDefinition { Width = 150 }
                 },
-                IsVisible = false 
+                IsVisible = false
             };
 
- 
             for (int row = 0; row < 3; row++)
             {
                 for (int column = 0; column < 3; column++)
@@ -89,7 +89,7 @@ namespace TARpv23_Mobiile_App
                 FontSize = 20,
                 Padding = new Thickness(20, 10)
             };
-            botModeButton.Clicked += (s, e) => StartGame(true);
+            botModeButton.Clicked += (s, e) => ShowDifficultySelection();
 
             Content = new StackLayout
             {
@@ -98,9 +98,51 @@ namespace TARpv23_Mobiile_App
             };
         }
 
+        private void ShowDifficultySelection()
+        {
+            var layout = new StackLayout { VerticalOptions = LayoutOptions.Center };
+
+            var difficultyPicker = new Picker
+            {
+                Title = "Vali raskusaste",
+                ItemsSource = new List<string> { "Keskmine", "Raske" },
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+
+            difficultyPicker.SelectedIndexChanged += (sender, args) =>
+            {
+                botDifficulty = difficultyPicker.SelectedIndex == 0 ? "Medium" : "Hard";
+            };
+
+            var startButton = new Button
+            {
+                Text = "Alusta mängu",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                BackgroundColor = Colors.LightBlue,
+                TextColor = Colors.White,
+                FontSize = 20,
+                Padding = new Thickness(20, 10)
+            };
+            startButton.Clicked += (s, e) =>
+            {
+                if (difficultyPicker.SelectedIndex == -1)
+                {
+                    DisplayAlert("Error", "Palun vali raskusaste!", "OK");
+                    return;
+                }
+                ShowFirstMoveSelection(true);
+            };
+
+            layout.Children.Add(difficultyPicker);
+            layout.Children.Add(startButton);
+
+            Content = layout;
+        }
+
         private void ShowFirstMoveSelection(bool isBotMode)
         {
-  
             var layout = new StackLayout { VerticalOptions = LayoutOptions.Center };
 
             var MovePicker = new Picker
@@ -121,17 +163,17 @@ namespace TARpv23_Mobiile_App
 
             themePicker.SelectedIndexChanged += (sender, args) =>
             {
-                selectedTheme = themePicker.SelectedIndex == 0 ? "Light" : "Dark"; 
-                ApplyTheme(selectedTheme); 
+                selectedTheme = themePicker.SelectedIndex == 0 ? "Light" : "Dark";
+                ApplyTheme(selectedTheme);
             };
 
             MovePicker.SelectedIndexChanged += (sender, args) =>
             {
-                if (MovePicker.SelectedIndex == 0) 
+                if (MovePicker.SelectedIndex == 0)
                 {
                     isCrossTurn = true;
                 }
-                else if (MovePicker.SelectedIndex == 1) 
+                else if (MovePicker.SelectedIndex == 1)
                 {
                     isCrossTurn = false;
                 }
@@ -154,7 +196,7 @@ namespace TARpv23_Mobiile_App
                     DisplayAlert("Error", "Palun vali, kes alustab!", "OK");
                     return;
                 }
-                StartGame(false); 
+                StartGame(true);
             };
 
             layout.Children.Add(MovePicker);
@@ -182,9 +224,9 @@ namespace TARpv23_Mobiile_App
 
         private void StartGame(bool againstBot)
         {
-            AgainstBot = againstBot; 
-            ResetGame(); 
-            grid.IsVisible = true; 
+            AgainstBot = againstBot;
+            ResetGame();
+            grid.IsVisible = true;
 
             Content = grid;
 
@@ -212,7 +254,7 @@ namespace TARpv23_Mobiile_App
             var image = new Image
             {
                 Aspect = Aspect.AspectFit,
-                IsVisible = false 
+                IsVisible = false
             };
 
             cellImages[row, column] = image;
@@ -226,12 +268,11 @@ namespace TARpv23_Mobiile_App
 
         private void CellClicked(int row, int column)
         {
-   
             if (cellImages[row, column].IsVisible)
-                return; 
+                return;
 
             cellImages[row, column].Source = isCrossTurn ? "rist.png" : "ring.png";
-            cellImages[row, column].IsVisible = true; 
+            cellImages[row, column].IsVisible = true;
 
             if (CheckForWin(row, column))
             {
@@ -263,12 +304,12 @@ namespace TARpv23_Mobiile_App
 
             if (emptyCells.Any())
             {
-                int delayTime = random.Next(1000, 3001); 
+                int delayTime = random.Next(1000, 3001);
 
                 await Task.Delay(delayTime);
 
-                var (row, column) = emptyCells[random.Next(emptyCells.Count)];
-                cellImages[row, column].Source = "ring.png"; 
+                var (row, column) = botDifficulty == "Medium" ? GetRandomMove(emptyCells) : GetBestMove(emptyCells);
+                cellImages[row, column].Source = "ring.png";
                 cellImages[row, column].IsVisible = true;
 
                 if (CheckForWin(row, column))
@@ -279,7 +320,7 @@ namespace TARpv23_Mobiile_App
                 }
 
                 if (CheckForDraw())
-                {
+                {  
                     DisplayAlert("Loosi!", "Kõik täis!", "OK.");
                     ShowDialog();
                     return;
@@ -287,6 +328,139 @@ namespace TARpv23_Mobiile_App
 
                 isCrossTurn = !isCrossTurn;
             }
+        }
+
+        private (int row, int column) GetRandomMove(List<(int row, int column)> emptyCells)
+        {
+            return emptyCells[random.Next(emptyCells.Count)];
+        }
+
+        private (int row, int column) GetBestMove(List<(int row, int column)> emptyCells)
+        {
+
+            foreach (var (row, column) in emptyCells)
+            {
+                cellImages[row, column].Source = "ring.png";
+                if (CheckForWin(row, column))
+                {
+                    cellImages[row, column].Source = null;
+                    return (row, column);
+                }
+                cellImages[row, column].Source = null;
+            }
+
+            foreach (var (row, column) in emptyCells)
+            {
+                cellImages[row, column].Source = "rist.png";
+                if (CheckForWin(row, column))
+                {
+                    cellImages[row, column].Source = null;
+                    return (row, column);
+                }
+                cellImages[row, column].Source = null;
+            }
+
+            foreach (var (row, column) in emptyCells)
+            {
+                cellImages[row, column].Source = "rist.png";
+
+                if (TwoInARow("rist.png", out var blockingCell))
+                {
+                    cellImages[row, column].Source = null;
+                    return blockingCell;
+                }
+
+
+                cellImages[row, column].Source = null;
+            }
+
+            return GetRandomMove(emptyCells);
+        }
+
+        private bool TwoInARow(string playerSign, out (int row, int column) blockingCell)
+        {
+
+            for (int row = 0; row < 3; row++)
+            {
+                int count = 0;
+                int emptyColumn = -1;
+                for (int column = 0; column < 3; column++)
+                {
+                    if (cellImages[row, column].Source?.ToString().EndsWith(playerSign) == true)
+                        count++;
+                    else if (!cellImages[row, column].IsVisible)
+                        emptyColumn = column;
+                }
+                if (count == 2 && emptyColumn != -1)
+                {
+                    blockingCell = (row, emptyColumn);
+                    return true;
+                }
+            }
+
+
+            for (int column = 0; column < 3; column++)
+            {
+                int count = 0;
+                int emptyRow = -1;
+                for (int row = 0; row < 3; row++)
+                {
+                    if (cellImages[row, column].Source?.ToString().EndsWith(playerSign) == true)
+                        count++;
+                    else if (!cellImages[row, column].IsVisible)
+                        emptyRow = row;
+                }
+                if (count == 2 && emptyRow != -1)
+                {
+                    blockingCell = (emptyRow, column);
+                    return true;
+                }
+            }
+
+
+            int diag1Count = 0, diag2Count = 0;
+            int emptyDiag1Row = -1, emptyDiag1Col = -1;
+            int emptyDiag2Row = -1, emptyDiag2Col = -1;
+
+            for (int i = 0; i < 3; i++)
+            {
+
+                if (cellImages[i, i].Source?.ToString().EndsWith(playerSign) == true)
+                    diag1Count++;
+                else if (!cellImages[i, i].IsVisible)
+                {
+                    emptyDiag1Row = i;
+                    emptyDiag1Col = i;
+                }
+
+        
+                if (cellImages[i, 2 - i].Source?.ToString().EndsWith(playerSign) == true)
+                    diag2Count++;
+                else if (!cellImages[i, 2 - i].IsVisible)
+                {
+                    emptyDiag2Row = i;
+                    emptyDiag2Col = 2 - i;
+                }
+            }
+            //[ (0, 0)][ (0, 1)][ (0, 2)]
+            //[ (1, 0)][ (1, 1)][ (1, 2)]
+            //[ (2, 0)][ (2, 1)][ (2, 2)]
+
+
+            if (diag1Count == 2 && emptyDiag1Row != -1)
+            {
+                blockingCell = (emptyDiag1Row, emptyDiag1Col);
+                return true;
+            }
+
+            if (diag2Count == 2 && emptyDiag2Row != -1)
+            {
+                blockingCell = (emptyDiag2Row, emptyDiag2Col);
+                return true;
+            }
+
+            blockingCell = (-1, -1);
+            return false;
         }
 
         private bool CheckForWin(int row, int column)
@@ -325,10 +499,10 @@ namespace TARpv23_Mobiile_App
                 for (int column = 0; column < 3; column++)
                 {
                     if (!cellImages[row, column].IsVisible)
-                        return false; 
+                        return false;
                 }
             }
-            return true; 
+            return true;
         }
 
         private void ResetGame()
@@ -338,11 +512,11 @@ namespace TARpv23_Mobiile_App
                 for (int column = 0; column < 3; column++)
                 {
                     cellImages[row, column].IsVisible = false;
-                    cellImages[row, column].Source = null; 
+                    cellImages[row, column].Source = null;
                 }
             }
 
-            isCrossTurn = true; 
+            isCrossTurn = true;
         }
 
         private async void ShowDialog()
@@ -351,12 +525,12 @@ namespace TARpv23_Mobiile_App
             if (playAgain)
             {
                 ResetGame();
-                grid.IsVisible = true; 
-                Content = grid; 
+                grid.IsVisible = true;
+                Content = grid;
             }
             else
             {
-                SelectMode(null, null); 
+                SelectMode(null, null);
             }
         }
     }
