@@ -15,7 +15,7 @@ namespace TARpv23_Mobiile_App
         private bool AgainstBot = false;
         private Random random = new Random();
         private string selectedTheme = "Light";
-        private string botDifficulty = "Medium"; // По умолчанию средний уровень сложности
+        private string botDifficulty = "Medium"; 
 
         public Blank()
         {
@@ -35,15 +35,15 @@ namespace TARpv23_Mobiile_App
             {
                 RowDefinitions =
                 {
-                    new RowDefinition { Height = 150 },
-                    new RowDefinition { Height = 150 },
-                    new RowDefinition { Height = 150 }
+                    new RowDefinition { Height = 130 },
+                    new RowDefinition { Height = 130 },
+                    new RowDefinition { Height = 130 }
                 },
                 ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = 150 },
-                    new ColumnDefinition { Width = 150 },
-                    new ColumnDefinition { Width = 150 }
+                    new ColumnDefinition { Width = 130 },
+                    new ColumnDefinition { Width = 130 },
+                    new ColumnDefinition { Width = 130 }
                 },
                 IsVisible = false
             };
@@ -77,7 +77,7 @@ namespace TARpv23_Mobiile_App
                 FontSize = 20,
                 Padding = new Thickness(20, 10)
             };
-            friendModeButton.Clicked += (s, e) => ShowFirstMoveSelection(false);
+            friendModeButton.Clicked += (s, e) => FirstMove(false);
 
             var botModeButton = new Button
             {
@@ -89,7 +89,7 @@ namespace TARpv23_Mobiile_App
                 FontSize = 20,
                 Padding = new Thickness(20, 10)
             };
-            botModeButton.Clicked += (s, e) => ShowDifficultySelection();
+            botModeButton.Clicked += (s, e) => DifficultySelect();
 
             Content = new StackLayout
             {
@@ -98,7 +98,7 @@ namespace TARpv23_Mobiile_App
             };
         }
 
-        private void ShowDifficultySelection()
+        private void DifficultySelect()
         {
             var layout = new StackLayout { VerticalOptions = LayoutOptions.Center };
 
@@ -132,7 +132,7 @@ namespace TARpv23_Mobiile_App
                     DisplayAlert("Error", "Palun vali raskusaste!", "OK");
                     return;
                 }
-                ShowFirstMoveSelection(true);
+                FirstMove(true);
             };
 
             layout.Children.Add(difficultyPicker);
@@ -141,7 +141,7 @@ namespace TARpv23_Mobiile_App
             Content = layout;
         }
 
-        private void ShowFirstMoveSelection(bool isBotMode)
+        private void FirstMove(bool isBotMode)
         {
             var layout = new StackLayout { VerticalOptions = LayoutOptions.Center };
 
