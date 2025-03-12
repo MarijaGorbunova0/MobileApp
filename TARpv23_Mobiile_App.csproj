@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this:  -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 
 		<!-- Note for MacCatalyst:
@@ -56,7 +56,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Remove="Sms.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Resources\Fonts\Lothares 400.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Sms.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -72,6 +82,9 @@
 	  </Compile>
 	  <Compile Update="Lumememm.xaml.cs">
 	    <DependentUpon>Lumememm.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Sms.xaml.cs">
+	    <DependentUpon>Sms.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="slider.xaml.cs">
 	    <DependentUpon>slider.xaml</DependentUpon>

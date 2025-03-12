@@ -2,8 +2,8 @@ namespace TARpv23_Mobiile_App;
 
 public partial class StartPage : ContentPage
 {
-    public List<ContentPage> lehed = new List<ContentPage>() { new TextPage(0), new FigurePage(1), new ValgusfoorPage(), new slider(), new Lumememm(), new Blank()};
-    public List<string> tekstid = new List<string> { "TekstPage", "FigurePage", "Valgusfoor", "rgb", "Lumememm", "Blank" };
+    public List<ContentPage> lehed = new List<ContentPage>() { new TextPage(0), new FigurePage(1), new ValgusfoorPage(), new slider(), new Lumememm(), new Blank(), new Sms()};
+    public List<string> tekstid = new List<string> { "TekstPage", "FigurePage", "Valgusfoor", "rgb", "Lumememm", "Blank", "Sms" };
     ScrollView sv;
     VerticalStackLayout vsl;
     Button showPagesButton;
