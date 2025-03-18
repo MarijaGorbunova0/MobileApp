@@ -93,7 +93,6 @@
 	    <DependentUpon>Blank.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
-
 	<ItemGroup>
 	  <MauiXaml Update="FigurePage - Copy.xaml">
 	    <Generator>MSBuild:Compile</Generator>
