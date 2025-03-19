@@ -3,184 +3,148 @@ using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.Media;
 using Microsoft.Maui.Storage;
 using System.IO;
-using Microsoft.Maui.Layouts;
+using System.Collections.Generic;
 
 namespace TARpv23_Mobiile_App
 {
     public partial class Sms : ContentPage
     {
-
-        private VerticalStackLayout kontaktLayout;
-
-        private Button addContactButton;
+        private TableView contactsTableView;
+        private Button addContactBTN;
 
         public Sms()
         {
 
-            addContactButton = new Button
+            addContactBTN = new Button
             {
-                Text = "Добавить новый контакт",
+                Text = "Lisada uus kontakt",
                 VerticalOptions = LayoutOptions.Start,
                 HorizontalOptions = LayoutOptions.End,
                 BackgroundColor = Colors.LightGray,
                 TextColor = Colors.Black
             };
-            addContactButton.Clicked += AddContactButton_Clicked;
+            addContactBTN.Clicked += AddContactBTN_Clicked;
 
-            kontaktLayout = new VerticalStackLayout();
-
-
-            AddContactToLayout("Иван Иванов", "123-456-789", "ivan@mail.com", null);
-
-            var layout = new AbsoluteLayout
+            contactsTableView = new TableView
             {
-                Children =
-                {
-                    addContactButton
-                }
+                Intent = TableIntent.Data,
+                Root = new TableRoot("kontaktid")
             };
 
-            AbsoluteLayout.SetLayoutBounds(addContactButton, new Rect(1, 0, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
-            AbsoluteLayout.SetLayoutFlags(addContactButton, AbsoluteLayoutFlags.PositionProportional);
+            AddContactTB("Roma Pro", "123456789", "romapro@mail.com", null);
 
-            var scrollView = new ScrollView
+            var layout = new VerticalStackLayout
             {
-                Content = new VerticalStackLayout
-                {
-                    Children = { kontaktLayout }
-                }
+                Children = { addContactBTN, contactsTableView }
             };
-
-            layout.Children.Add(scrollView);
 
             Content = layout;
         }
 
-        private void AddContactToLayout(string name, string phone, string email, ImageSource photo)
+        private void AddContactTB(string name, string phone, string email, ImageSource photo)
         {
-            var nameLabel = new Label
+            var contactSection = new TableSection(name)
             {
-                Text = $"Имя: {name}",
-                FontSize = 18,
-                HorizontalOptions = LayoutOptions.Start
+                new TextCell { Text = "nimi", Detail = name },
+                new TextCell { Text = "telefon", Detail = phone },
+                new TextCell { Text = "Email", Detail = email }
             };
 
-            var phoneLabel = new Label
+            if (photo != null)
             {
-                Text = $"Телефон: {phone}",
-                FontSize = 18,
-                HorizontalOptions = LayoutOptions.Start
-            };
+                contactSection.Add(new ImageCell { Text = "foto", ImageSource = photo });
+            }
 
-            var emailLabel = new Label
+            contactSection.Add(new ViewCell
             {
-                Text = $"Email: {email}",
-                FontSize = 18,
-                HorizontalOptions = LayoutOptions.Start
-            };
-
-            var contactImage = new Image
-            {
-                Source = photo,
-                HeightRequest = 100,
-                WidthRequest = 100,
-                HorizontalOptions = LayoutOptions.Center
-            };
-
-            var smsButton = new Button
-            {
-                Text = "Написать SMS",
-                BackgroundColor = Colors.LightBlue,
-                TextColor = Colors.White
-            };
-            smsButton.Clicked += async (sender, e) =>
-            {
-                try
+                View = new HorizontalStackLayout
                 {
-                    var smsMessage = new SmsMessage("", phone); 
-                    await Microsoft.Maui.ApplicationModel.Communication.Sms.Default.ComposeAsync(smsMessage);
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Ошибка", $"Не удалось открыть SMS: {ex.Message}", "OK");
-                }
-            };
-
-            var emailButton = new Button
-            {
-                Text = "Написать на почту",
-                BackgroundColor = Colors.LightGreen,
-                TextColor = Colors.White
-            };
-            emailButton.Clicked += async (sender, e) =>
-            {
-                try
-                {
-                    var emailMessage = new EmailMessage
+                    Children =
                     {
-                        To = new List<string> { email },
-                        Subject = "",
-                        Body = ""
-                    };
-                    await Email.Default.ComposeAsync(emailMessage); 
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Ошибка", $"Не удалось открыть почту: {ex.Message}", "OK");
-                }
-            };
-
-            var callButton = new Button
-            {
-                Text = "Позвонить",
-                BackgroundColor = Colors.LightCoral,
-                TextColor = Colors.White
-            };
-            callButton.Clicked += (sender, e) =>
-            {
-                try
-                {
-                    if (PhoneDialer.IsSupported)
-                    {
-                        PhoneDialer.Open(phone);
-                    }
-                    else
-                    {
-                        DisplayAlert("Ошибка", "Звонки не поддерживаются на этом устройстве.", "OK");
+                        new Button
+                        {
+                            Text = "SMS",
+                            BackgroundColor = Colors.LightBlue,
+                            TextColor = Colors.White,
+                            WidthRequest = 130,
+                            Command = new Command(async () =>
+                            {
+                                try
+                                {
+                                    var smsMessage = new SmsMessage("", phone);
+                                    await Microsoft.Maui.ApplicationModel.Communication.Sms.Default.ComposeAsync(smsMessage);
+                                }
+                                catch (Exception ex)
+                                {
+                                    await DisplayAlert("viga", $"ei saanud avada SMS: {ex.Message}", "OK");
+                                }
+                            })
+                        },
+                        new Button
+                        {
+                            Text = "Email",
+                            BackgroundColor = Colors.LightGreen,
+                            TextColor = Colors.White,
+                            WidthRequest = 130,
+                            Command = new Command(async () =>
+                            {
+                                try
+                                {
+                                    var emailMessage = new EmailMessage
+                                    {
+                                        To = new List<string> { email },
+                                        Subject = "",
+                                        Body = ""
+                                    };
+                                    await Email.Default.ComposeAsync(emailMessage);
+                                }
+                                catch (Exception ex)
+                                {
+                                    await DisplayAlert("viga", $"ei saanud avada email: {ex.Message}", "OK");
+                                }
+                            })
+                        },
+                        new Button
+                        {
+                            Text = "helista",
+                            BackgroundColor = Colors.LightCoral,
+                            TextColor = Colors.White,
+                            WidthRequest = 130,
+                            Command = new Command(() =>
+                            {
+                                try
+                                {
+                                    if (PhoneDialer.IsSupported)
+                                    {
+                                        PhoneDialer.Open(phone);
+                                    }
+                                    else
+                                    {
+                                        DisplayAlert("viga", "ei saanud helistada", "OK");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    DisplayAlert("viga", $"mingi pribleem {ex.Message}", "OK");
+                                }
+                            })
+                        }
                     }
                 }
-                catch (Exception ex)
-                {
-                    DisplayAlert("Ошибка", $"Не удалось совершить звонок: {ex.Message}", "OK");
-                }
-            };
+            }); 
 
-            var buttonsLayout = new HorizontalStackLayout
-            {
-                Children = { smsButton, emailButton, callButton }
-            };
-
-            var contactLayout = new VerticalStackLayout
-            {
-                Children = { contactImage, nameLabel, phoneLabel, emailLabel, buttonsLayout },
-                BackgroundColor = Colors.LightSkyBlue, 
-                Padding = new Thickness(10),
-                Spacing = 10
-            };
-
-            kontaktLayout.Children.Add(contactLayout);
+            contactsTableView.Root.Add(contactSection);
         }
 
-        private async void AddContactButton_Clicked(object sender, EventArgs e)
+        private async void AddContactBTN_Clicked(object sender, EventArgs e)
         {
+            var nameEntry = new Entry { Placeholder = "Nimi" };
+            var phoneEntry = new Entry { Placeholder = "telefon", Keyboard = Keyboard.Telephone };
+            var emailEntry = new Entry { Placeholder = "email", Keyboard = Keyboard.Email };
 
-            var nameEntry = new Entry { Placeholder = "Введите имя" };
-            var phoneEntry = new Entry { Placeholder = "Введите телефон", Keyboard = Keyboard.Telephone };
-            var emailEntry = new Entry { Placeholder = "Введите email", Keyboard = Keyboard.Email };
-
-            var takePhotoButton = new Button
+            var takePhotoBTN = new Button
             {
-                Text = "Сделать фото",
+                Text = "teha foto",
                 BackgroundColor = Colors.LightGray,
                 TextColor = Colors.White
             };
@@ -192,21 +156,19 @@ namespace TARpv23_Mobiile_App
                 HorizontalOptions = LayoutOptions.Center
             };
 
-            byte[] photoBytes = null; 
+            byte[] photoBytes = null;
 
-            takePhotoButton.Clicked += async (sender, e) =>
+            takePhotoBTN.Clicked += async (sender, e) =>
             {
                 try
                 {
-
                     var status = await Permissions.RequestAsync<Permissions.Camera>();
                     if (status != PermissionStatus.Granted)
                     {
-                        await DisplayAlert("Ошибка", "Разрешение на использование камеры не предоставлено.", "OK");
+                        await DisplayAlert("viga", "ei ole õigust", "OK");
                         return;
                     }
 
-                    // Создание фото
                     var photo = await MediaPicker.CapturePhotoAsync();
                     if (photo != null)
                     {
@@ -217,23 +179,22 @@ namespace TARpv23_Mobiile_App
                             photoBytes = memoryStream.ToArray();
                         }
 
-
                         contactPhoto.Source = ImageSource.FromStream(() => new MemoryStream(photoBytes));
                     }
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Ошибка", $"Не удалось сделать фото: {ex.Message}", "OK");
+                    await DisplayAlert("viga", $"ei saanud teha foto {ex.Message}", "OK");
                 }
             };
 
-            var saveButton = new Button
+            var saveBTN = new Button
             {
-                Text = "Сохранить",
+                Text = "salvestama",
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
 
-            saveButton.Clicked += async (s, args) =>
+            saveBTN.Clicked += async (s, args) =>
             {
                 string name = nameEntry.Text;
                 string phone = phoneEntry.Text;
@@ -241,25 +202,24 @@ namespace TARpv23_Mobiile_App
 
                 if (photoBytes != null)
                 {
-                    AddContactToLayout(name, phone, email, ImageSource.FromStream(() => new MemoryStream(photoBytes)));
+                    AddContactTB(name, phone, email, ImageSource.FromStream(() => new MemoryStream(photoBytes)));
                 }
                 else
                 {
-                    AddContactToLayout(name, phone, email, null);
+                    AddContactTB(name, phone, email, null);
                 }
 
-                await DisplayAlert("Успех", "Контакт добавлен!", "OK");
+                await DisplayAlert("edukas", "kontakt on lisanud!", "OK");
             };
 
             var contactFormLayout = new VerticalStackLayout
             {
-                Children = { nameEntry, phoneEntry, emailEntry, takePhotoButton, contactPhoto, saveButton }
+                Children = { nameEntry, phoneEntry, emailEntry, takePhotoBTN, contactPhoto, saveBTN }
             };
-
 
             await Navigation.PushModalAsync(new ContentPage
             {
-                Title = "Добавить контакт",
+                Title = "lisada kontakt",
                 Content = new ScrollView { Content = contactFormLayout }
             });
         }
