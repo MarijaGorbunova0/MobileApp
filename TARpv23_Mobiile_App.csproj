@@ -56,14 +56,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Remove="Riigid.xaml" />
 	  <MauiXaml Remove="Sms.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="Resources\Fonts\Lothares 400.ttf" />
+	  <None Remove="Resources\Images\flag_of_estonia.png" />
+	  <None Remove="Resources\Images\flag_of_filland.JPG" />
+	  <None Remove="Resources\Images\flag_of_germany.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Riigid.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
 	  <EmbeddedResource Include="Sms.xaml">
 	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	  </EmbeddedResource>
@@ -82,6 +89,9 @@
 	  </Compile>
 	  <Compile Update="Lumememm.xaml.cs">
 	    <DependentUpon>Lumememm.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Riigid.xaml.cs">
+	    <DependentUpon>Riigid.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Sms.xaml.cs">
 	    <DependentUpon>Sms.xaml</DependentUpon>

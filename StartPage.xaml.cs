@@ -2,8 +2,8 @@ namespace TARpv23_Mobiile_App;
 
 public partial class StartPage : ContentPage
 {
-    public List<ContentPage> lehed = new List<ContentPage>() { new TextPage(0), new FigurePage(1), new ValgusfoorPage(), new slider(), new Lumememm(), new Blank(), new Sms()};
-    public List<string> tekstid = new List<string> { "TekstPage", "FigurePage", "Valgusfoor", "rgb", "Lumememm", "Blank", "Sms" };
+    public List<ContentPage> lehed = new List<ContentPage>() { new TextPage(0), new FigurePage(1), new ValgusfoorPage(), new slider(), new Lumememm(), new Blank(), new Sms(), new Riigid()};
+    public List<string> tekstid = new List<string> { "TekstPage", "FigurePage", "Valgusfoor", "rgb", "Lumememm", "Blank", "Sms", "Riigid" };
     ScrollView sv;
     VerticalStackLayout vsl;
     Button showPagesButton;
@@ -11,7 +11,7 @@ public partial class StartPage : ContentPage
     public StartPage()
     {
         Title = "Avaleht";
-        vsl = new VerticalStackLayout { BackgroundColor = Color.FromArgb("#C2E3E3") };
+        vsl = new VerticalStackLayout { BackgroundColor = Color.FromArgb("#C2E3E3") };  
 
  
         showPagesButton = new Button
