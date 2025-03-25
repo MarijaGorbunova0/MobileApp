@@ -23,6 +23,13 @@ namespace TARpv23_Mobiile_App
             };
             addButton.Clicked += AddCountryClicked;
 
+            var searchButton = new Button
+            {
+                Text = "Otsi riiki",
+                Margin = new Thickness(10)
+            };
+            searchButton.Clicked += OnSearchCountryClicked;  // Обработчик для поиска
+
             _listView = new ListView
             {
                 ItemsSource = _countries,
@@ -58,7 +65,7 @@ namespace TARpv23_Mobiile_App
 
             Content = new StackLayout
             {
-                Children = { addButton, _listView }
+                Children = { addButton, searchButton, _listView }
             };
         }
 
@@ -110,6 +117,26 @@ namespace TARpv23_Mobiile_App
                 ((ListView)sender).SelectedItem = null;
 
                 await Navigation.PushAsync(new CountryDetailPage(selectedCountry));
+            }
+        }
+
+        private async void OnSearchCountryClicked(object sender, EventArgs e)
+        {
+            string countryName = await DisplayPromptAsync("Otsi riiki", "Sisestage riigi nimi:");
+
+            if (!string.IsNullOrWhiteSpace(countryName))
+            {
+                var country = _countries.FirstOrDefault(c => c.Name.Equals(countryName, StringComparison.OrdinalIgnoreCase));
+
+                if (country != null)
+                {
+                    await DisplayAlert(country.Name,
+                        $"Pealinn: {country.Capital}\nRahvaarv: {country.Population:N0}\n", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Ei leitud", "Riiki ei leitud", "OK");
+                }
             }
         }
     }
